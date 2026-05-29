@@ -1,0 +1,34 @@
+{
+  "users": [
+    {
+      "name": "finance_ai",
+      "password": "finance_ai",
+      "tags": "administrator"
+    }
+  ],
+  "vhosts": [{ "name": "/" }],
+  "permissions": [
+    {
+      "user": "finance_ai",
+      "vhost": "/",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "queues": [
+    {
+      "name": "ai.workflow.tasks",
+      "vhost": "/",
+      "durable": true
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "ai.workflow",
+      "vhost": "/",
+      "type": "topic",
+      "durable": true
+    }
+  ]
+}

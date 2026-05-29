@@ -1,0 +1,76 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: finance_ai
+      RABBITMQ_DEFAULT_PASS: finance_ai
+    volumes:
+      - ./infra/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+      - ./infra/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8080:80"
+    volumes:
+      - ./infra/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - ai-workflow-service
+      - llm-intent-parser-service
+      - ai-context-builder-service
+      - analytics-service
+      - llm-response-agent-service
+
+  ai-workflow-service:
+    build:
+      context: ./ai-workflow-service
+      dockerfile: Dockerfile
+    ports:
+      - "8010:8010"
+    env_file:
+      - .env.example
+    depends_on:
+      - rabbitmq
+      - llm-intent-parser-service
+      - ai-context-builder-service
+      - analytics-service
+      - llm-response-agent-service
+
+  llm-intent-parser-service:
+    build:
+      context: ./llm-intent-parser-service
+      dockerfile: Dockerfile
+    ports:
+      - "8011:8011"
+    env_file:
+      - .env.example
+
+  ai-context-builder-service:
+    build:
+      context: ./ai-context-builder-service
+      dockerfile: Dockerfile
+    ports:
+      - "8012:8012"
+    env_file:
+      - .env.example
+
+  analytics-service:
+    build:
+      context: ./analytics-service
+      dockerfile: Dockerfile
+    ports:
+      - "8013:8013"
+    env_file:
+      - .env.example
+
+  llm-response-agent-service:
+    build:
+      context: ./llm-response-agent-service
+      dockerfile: Dockerfile
+    ports:
+      - "8014:8014"
+    env_file:
+      - .env.example

@@ -1,0 +1,2 @@
+"""RecommendationType."""
+# TODO: implement
