@@ -1,7 +1,4 @@
 """Data quality metadata."""
-from pydantic import BaseModel
+from shared_contracts.context_package import DataQuality
 
-
-class DataQuality(BaseModel):
-    completeness: float = 1.0
-    warnings: list[str] = []
+__all__ = ["DataQuality"]

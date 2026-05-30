@@ -326,7 +326,7 @@ class WorkflowStatus(str, Enum):
             '''"""Cross-service contract placeholders."""
 from pydantic import BaseModel
 
-# TODO: align with packages/shared-contracts
+# TODO: align with packages/shared_contracts
 ''',
         ),
     ]:
@@ -1176,7 +1176,7 @@ def scaffold_packages() -> None:
         ("workflow/workflow_status.py", "WorkflowStatus", "value: str = 'pending'"),
         ("workflow/workflow_result.py", "WorkflowResult", "task_id: str"),
     ]
-    pkg_base = ROOT / "packages" / "shared-contracts"
+    pkg_base = ROOT / "packages" / "shared_contracts"
     write(
         pkg_base / "pyproject.toml",
         '''[project]

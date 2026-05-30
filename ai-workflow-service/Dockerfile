@@ -8,12 +8,14 @@ ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
     UV_PYTHON_DOWNLOADS=never
 
-COPY pyproject.toml uv.lock ./
+COPY ai-workflow-service/pyproject.toml ai-workflow-service/uv.lock ./
+COPY packages/shared_contracts ../packages/shared_contracts
+COPY packages/shared_http ../packages/shared_http
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev
 
-COPY app ./app
+COPY ai-workflow-service/app ./app
 
 EXPOSE 8010
 

@@ -1,9 +1,6 @@
 """Intent parse response schema."""
-from pydantic import BaseModel, Field
+from shared_contracts.intent_result import IntentParserResponse, IntentResult
 
+IntentParseResponse = IntentParserResponse
 
-class IntentParseResponse(BaseModel):
-    intent: str = "unknown"
-    confidence: float = 0.0
-    entities: dict = Field(default_factory=dict)
-    # TODO: align with full intent_result JSON from docs
+__all__ = ["IntentParseResponse", "IntentParserResponse", "IntentResult"]

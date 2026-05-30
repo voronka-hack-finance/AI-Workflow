@@ -1,0 +1,29 @@
+[project]
+name = "shared-contracts"
+version = "0.1.0"
+description = "Shared Pydantic contracts across AI services"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["pydantic>=2.9.0"]
+
+[dependency-groups]
+dev = ["pytest>=8.3.0"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["shared_contracts"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"__init__.py" = "shared_contracts/__init__.py"
+"common.py" = "shared_contracts/common.py"
+"intent_result.py" = "shared_contracts/intent_result.py"
+"normalized_data.py" = "shared_contracts/normalized_data.py"
+"context_package.py" = "shared_contracts/context_package.py"
+"financial_analysis_result.py" = "shared_contracts/financial_analysis_result.py"
+"response_agent_result.py" = "shared_contracts/response_agent_result.py"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

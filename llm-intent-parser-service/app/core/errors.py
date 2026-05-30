@@ -11,3 +11,7 @@ class ServiceUnavailableError(AppError):
 
 class ValidationError(AppError):
     """Raised when input validation fails."""
+
+
+class LLMParseError(AppError):
+    """Raised when LLM output cannot be parsed or validated."""

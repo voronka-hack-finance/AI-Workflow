@@ -1,7 +1,4 @@
 """Single agent output."""
-from pydantic import BaseModel
+from shared_contracts.response_agent_result import AgentOutput
 
-
-class AgentOutput(BaseModel):
-    agent_name: str
-    content: str = ""
+__all__ = ["AgentOutput"]

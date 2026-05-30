@@ -1,10 +1,12 @@
 """Workflow result schema."""
 from pydantic import BaseModel
 
-from app.schemas.workflow_status import WorkflowStatus
+from app.workflow.statuses import WorkflowStatus
 
 
 class WorkflowResult(BaseModel):
-    task_id: str
-    status: WorkflowStatus = WorkflowStatus.PENDING
-    # TODO: add final_answer, error details
+    request_id: str
+    workflow_run_id: str
+    status: WorkflowStatus
+    final_answer: str | None = None
+    error_message: str | None = None

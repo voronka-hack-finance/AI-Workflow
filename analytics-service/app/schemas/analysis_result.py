@@ -1,8 +1,4 @@
-"""Full analysis response."""
-from pydantic import BaseModel
+"""Analysis summary result."""
+from shared_contracts.financial_analysis_result import AnalysisResult
 
-from app.schemas.financial_analysis_result import FinancialAnalysisResult
-
-
-class AnalysisResult(BaseModel):
-    financial_analysis: FinancialAnalysisResult = FinancialAnalysisResult()
+__all__ = ["AnalysisResult"]

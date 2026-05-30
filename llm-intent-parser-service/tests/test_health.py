@@ -9,3 +9,6 @@ def test_health() -> None:
     response = client.get("/health")
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
+    assert response.json()["service"] == "llm-intent-parser-service"
+    assert "llm_provider" in response.json()
+    assert "llm_model" in response.json()

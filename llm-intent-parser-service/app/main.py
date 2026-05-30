@@ -8,7 +8,7 @@ from app.api.v1.parse_intent import router as parse_intent_router
 setup_logging()
 
 app = FastAPI(
-    title="AI Service",
+    title="LLM Intent Parser Service",
     version="0.1.0",
 )
 

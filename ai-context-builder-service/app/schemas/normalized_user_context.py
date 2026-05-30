@@ -1,7 +1,6 @@
 """Normalized user context."""
-from pydantic import BaseModel
+from shared_contracts.normalized_data import UserFinancialContextNormalized
 
+NormalizedUserContext = UserFinancialContextNormalized
 
-class NormalizedUserContext(BaseModel):
-    user_id: str
-    # TODO: extend
+__all__ = ["NormalizedUserContext", "UserFinancialContextNormalized"]

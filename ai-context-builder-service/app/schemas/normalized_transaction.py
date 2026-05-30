@@ -1,8 +1,6 @@
 """Normalized transaction."""
-from pydantic import BaseModel
+from shared_contracts.normalized_data import TransactionNormalized
 
+NormalizedTransaction = TransactionNormalized
 
-class NormalizedTransaction(BaseModel):
-    id: str
-    amount: float = 0.0
-    # TODO: extend
+__all__ = ["NormalizedTransaction", "TransactionNormalized"]

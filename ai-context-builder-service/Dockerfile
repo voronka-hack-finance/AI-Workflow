@@ -8,12 +8,13 @@ ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
     UV_PYTHON_DOWNLOADS=never
 
-COPY pyproject.toml uv.lock ./
+COPY ai-context-builder-service/pyproject.toml ai-context-builder-service/uv.lock ./
+COPY packages/shared_contracts ../packages/shared_contracts
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-dev
 
-COPY app ./app
+COPY ai-context-builder-service/app ./app
 
 EXPOSE 8012
 

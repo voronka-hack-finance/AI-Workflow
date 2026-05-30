@@ -1,7 +1,4 @@
 """Category profile."""
-from pydantic import BaseModel
+from shared_contracts.normalized_data import CategoryProfile
 
-
-class CategoryProfile(BaseModel):
-    category_id: str
-    name: str = ""
+__all__ = ["CategoryProfile"]

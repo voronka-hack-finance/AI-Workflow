@@ -26,12 +26,17 @@ services:
 
   ai-workflow-service:
     build:
-      context: ./ai-workflow-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ai-workflow-service/Dockerfile
     ports:
       - "8010:8010"
     env_file:
-      - .env.example
+      - path: .env.example
+        required: true
+      - path: .env
+        required: false
+    environment:
+      INTENT_PARSER_HTTP_TIMEOUT_SECONDS: 150
     depends_on:
       - rabbitmq
       - llm-intent-parser-service
@@ -41,17 +46,29 @@ services:
 
   llm-intent-parser-service:
     build:
-      context: ./llm-intent-parser-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: llm-intent-parser-service/Dockerfile
     ports:
       - "8011:8011"
     env_file:
-      - .env.example
+      - path: .env.example
+        required: true
+      - path: .env
+        required: false
+    environment:
+      # Hardcoded for Docker dev — do not inherit mock from shell or env_file
+      INTENT_PARSER_LLM_PROVIDER: openai_compatible
+      INTENT_PARSER_LLM_MODEL: ${INTENT_PARSER_LLM_MODEL:-qwen2.5-7b-instruct}
+      OPENAI_COMPATIBLE_BASE_URL: http://host.docker.internal:1234/v1
+      INTENT_PARSER_LLM_TIMEOUT_SECONDS: 120
+      INTENT_PARSER_FEW_SHOT_LIMIT: 0
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   ai-context-builder-service:
     build:
-      context: ./ai-context-builder-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ai-context-builder-service/Dockerfile
     ports:
       - "8012:8012"
     env_file:
@@ -59,8 +76,8 @@ services:
 
   analytics-service:
     build:
-      context: ./analytics-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: analytics-service/Dockerfile
     ports:
       - "8013:8013"
     env_file:
@@ -68,8 +85,8 @@ services:
 
   llm-response-agent-service:
     build:
-      context: ./llm-response-agent-service
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: llm-response-agent-service/Dockerfile
     ports:
       - "8014:8014"
     env_file:

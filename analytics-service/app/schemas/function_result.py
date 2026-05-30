@@ -1,7 +1,4 @@
 """Single function result."""
-from pydantic import BaseModel
+from shared_contracts.financial_analysis_result import FunctionResult
 
-
-class FunctionResult(BaseModel):
-    function_name: str
-    data: dict = {}
+__all__ = ["FunctionResult"]

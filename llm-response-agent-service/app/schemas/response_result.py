@@ -1,9 +1,6 @@
 """Response API result."""
-from pydantic import BaseModel
+from shared_contracts.response_agent_result import ResponseAgentResult
 
-from app.schemas.final_answer import FinalAnswer
+ResponseGenerateResult = ResponseAgentResult
 
-
-class ResponseGenerateResult(BaseModel):
-    answer: str = ""
-    final_answer: FinalAnswer | None = None
+__all__ = ["ResponseAgentResult", "ResponseGenerateResult"]

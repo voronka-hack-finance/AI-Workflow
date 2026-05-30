@@ -1,6 +1,6 @@
 """Final edited answer."""
-from pydantic import BaseModel
+from shared_contracts.response_agent_result import EditorOutput
 
+FinalAnswer = EditorOutput
 
-class FinalAnswer(BaseModel):
-    text: str = ""
+__all__ = ["EditorOutput", "FinalAnswer"]

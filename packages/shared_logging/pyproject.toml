@@ -1,0 +1,17 @@
+[project]
+name = "shared-logging"
+version = "0.1.0"
+description = "Shared logging utilities"
+readme = "README.md"
+requires-python = ">=3.12"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["shared_logging"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"__init__.py" = "shared_logging/__init__.py"
+"logger.py" = "shared_logging/logger.py"
