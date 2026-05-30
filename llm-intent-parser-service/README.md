@@ -1,8 +1,8 @@
 # LLM Intent Parser Service
 
-Parses user messages into canonical `intent_result` via LangChain and returns `IntentParserResponse`.
+Парсит сообщения пользователя в канонический `intent_result` через LangChain и возвращает `IntentParserResponse`.
 
-## Run locally
+## Локальный запуск
 
 ```bash
 cd llm-intent-parser-service
@@ -11,33 +11,33 @@ uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8011
 uv run pytest
 ```
 
-## Provider selection
+## Выбор провайдера
 
-Use environment variable `INTENT_PARSER_LLM_PROVIDER`:
+Переменная окружения `INTENT_PARSER_LLM_PROVIDER`:
 
-- `mock` — deterministic parser for tests and CI only
-- `openai_compatible` — external OpenAI-compatible server via `langchain-openai` (`ChatOpenAI`) (**default for local dev**)
+- `mock` — детерминированный парсер для тестов и CI
+- `openai_compatible` — внешний OpenAI-compatible сервер через `langchain-openai` (`ChatOpenAI`) (**по умолчанию для локальной разработки**)
 
-Default local dev uses LM Studio at `http://127.0.0.1:1234/v1` with model `qwen2.5-7b-instruct` (see `.env.example`).
+Локально по умолчанию — LM Studio на `http://127.0.0.1:1234/v1`, модель `qwen2.5-7b-instruct` (см. `.env.example`).
 
-**Docker Compose** uses `host.docker.internal:1234` so the container can reach LM Studio on the host. Check active provider:
+**Docker Compose** использует `host.docker.internal:1234`, чтобы контейнер достигал LM Studio на хосте. Проверка активного провайдера:
 
 ```powershell
 Invoke-RestMethod http://127.0.0.1:8011/health
-# llm_provider should be "openai_compatible", not "mock"
-# few_shot_limit: 0 for local 7B (recommended), omit for full few-shot on larger models
+# llm_provider должен быть "openai_compatible", не "mock"
+# few_shot_limit: 0 для локальной 7B (рекомендуется), omit — полный few-shot для больших моделей
 ```
 
-Local 7B models (e.g. `qwen2.5-7b-instruct` Q4) often copy the first few-shot example and return `expense_breakdown` for every query. Set `INTENT_PARSER_FEW_SHOT_LIMIT=0` so the model uses only the system prompt + your message.
+Локальные 7B-модели (например `qwen2.5-7b-instruct` Q4) часто копируют первый few-shot пример и возвращают `expense_breakdown` на любой запрос. Установите `INTENT_PARSER_FEW_SHOT_LIMIT=0`, чтобы модель использовала только system prompt + ваше сообщение.
 
-Example test/CI env:
+Пример env для тестов/CI:
 
 ```env
 INTENT_PARSER_LLM_PROVIDER=mock
 INTENT_PARSER_LLM_MODEL=mock-intent-parser
 ```
 
-Example local LM Studio env:
+Пример env для локального LM Studio:
 
 ```env
 INTENT_PARSER_LLM_PROVIDER=openai_compatible
@@ -49,14 +49,14 @@ INTENT_PARSER_MAX_OUTPUT_TOKENS=1200
 INTENT_PARSER_LLM_TIMEOUT_SECONDS=60
 ```
 
-The service does not load model weights in-process. LM Studio now and vLLM later both use the same `openai_compatible` provider.
+Сервис не загружает веса модели in-process. LM Studio сейчас и vLLM позже используют один и тот же провайдер `openai_compatible`.
 
-## Endpoints
+## Эндпоинты
 
-- `GET /health` — health check
-- `POST /api/v1/intent/parse` — parse user message into `IntentParserResponse`
+- `GET /health` — проверка здоровья
+- `POST /api/v1/intent/parse` — парсинг сообщения в `IntentParserResponse`
 
-Request example:
+Пример запроса:
 
 ```json
 {
@@ -74,8 +74,12 @@ Request example:
 }
 ```
 
-## Tests
+## Тесты
 
 ```bash
 INTENT_PARSER_LLM_PROVIDER=mock uv run pytest llm-intent-parser-service/tests
 ```
+
+## Статус
+
+Ядро реализовано: LangChain pipeline, провайдеры mock/openai_compatible, валидация, clarification, category normalizer. Real LLM integration-тесты могут требовать настройки модели.

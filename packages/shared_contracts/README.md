@@ -1,11 +1,11 @@
 # shared_contracts
 
-Shared Pydantic contracts for AI services.
+Общие Pydantic-контракты для AI-сервисов.
 
-Distribution name: `shared-contracts`  
-Import path: `shared_contracts`
+Имя пакета: `shared-contracts`  
+Импорт: `shared_contracts`
 
-## Layout
+## Структура
 
 ```text
 packages/shared_contracts/
@@ -21,18 +21,18 @@ packages/shared_contracts/
 └── README.md
 ```
 
-Package modules live directly in `packages/shared_contracts/` — no nested duplicate folder.
+Модули лежат непосредственно в `packages/shared_contracts/` — без вложенной дублирующей папки.
 
-## Usage
+## Использование
 
-Run tests from a service venv (packages do not keep their own `.venv`):
+Запуск тестов из сервиса:
 
 ```bash
 cd ai-workflow-service
 uv run pytest ../packages/shared_contracts/tests -q
 ```
 
-## Import check
+## Проверка импорта
 
 ```python
 from shared_contracts.intent_result import IntentResult, IntentParserResponse

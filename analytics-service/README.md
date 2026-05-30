@@ -1,8 +1,8 @@
 # Analytics Service
 
-Runs execution plan functions on context package.
+Выполняет функции execution plan над context package.
 
-## Run locally
+## Локальный запуск
 
 ```bash
 uv sync
@@ -11,11 +11,13 @@ uv run pytest
 uv run ruff check .
 ```
 
-## Endpoints
+## Эндпоинты
 
-- `GET /health` — health check
-- `POST /api/v1/analytics/run` — main API (skeleton)
+- `GET /health` — проверка здоровья
+- `POST /api/v1/analytics/run` — основной API (заглушка)
 
-## Status
+## Статус
 
-Skeleton only — business logic marked with `TODO`.
+Каркас: FastAPI, 14 analytics functions как классы-заглушки, `AnalyticsEngine`, `ExecutionPlanRunner`, scoring/helpers — в TODO.
+
+`POST /analytics/run` возвращает stub-ответ. Реализована утилита `safe_divide()` в `helpers/safe_math.py`.

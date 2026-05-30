@@ -1,8 +1,8 @@
 # LLM Response Agent Service
 
-Generates final user-facing response via agent pipeline.
+Генерирует финальный ответ пользователю через agent pipeline.
 
-## Run locally
+## Локальный запуск
 
 ```bash
 uv sync
@@ -11,11 +11,13 @@ uv run pytest
 uv run ruff check .
 ```
 
-## Endpoints
+## Эндпоинты
 
-- `GET /health` — health check
-- `POST /api/v1/response/generate` — main API (skeleton)
+- `GET /health` — проверка здоровья
+- `POST /api/v1/response/generate` — основной API (dev-stub)
 
-## Status
+## Статус
 
-Skeleton only — business logic marked with `TODO`.
+`POST /response/generate` работает через `build_dev_final_answer()` — шаблонный текст на русском без вызова LLM. Контрактная сборка `ResponseGenerateResult` (validation/routing/editor — hardcoded `"passed"` / `"dev_stub"`).
+
+Каркас agents/prompts/validators/pipeline на месте. `ResponseAgentService`, `LLMClient`, полноценный LangChain pipeline — в TODO.

@@ -1,8 +1,8 @@
 # AI Workflow Service
 
-Orchestrates AI pipeline steps via RabbitMQ, HTTP clients, and LangGraph.
+Оркестратор AI-конвейера: RabbitMQ, HTTP-клиенты к downstream-сервисам, LangGraph.
 
-## Run locally
+## Локальный запуск
 
 ```bash
 uv sync
@@ -11,26 +11,26 @@ uv run pytest
 uv run ruff check .
 ```
 
-## Endpoints
+## Эндпоинты
 
-- `GET /health` — health check
-- `POST /api/v1/workflow/run` — run workflow synchronously (dev/test)
-- `POST /api/v1/workflow/run/debug` — dev debug run with per-step service results
-- `POST /api/v1/workflow/run/batch` — run up to 10 workflows synchronously
-- `POST /api/v1/workflow/enqueue` — publish task to RabbitMQ (production-like)
+- `GET /health` — проверка здоровья
+- `POST /api/v1/workflow/run` — синхронный запуск workflow (dev/test)
+- `POST /api/v1/workflow/run/debug` — debug-запуск с результатами каждого шага
+- `POST /api/v1/workflow/run/batch` — до 10 синхронных запусков
+- `POST /api/v1/workflow/enqueue` — публикация задачи в RabbitMQ (production-like)
 
-## Workflow entry points
+## Точки входа workflow
 
-1. **RabbitMQ** — queue `ai.workflow.tasks` (consumer inside the service)
-2. **HTTP `/run`** — synchronous dev/test path, returns `WorkflowResult`
-3. **HTTP `/enqueue`** — validates task and publishes to RabbitMQ, returns `queued`
-4. **HTTP `/run/debug`** — dev debug path with per-step results (`intent_parser`, etc.)
+1. **RabbitMQ** — очередь `ai.workflow.tasks` (consumer внутри сервиса)
+2. **HTTP `/run`** — синхронный dev/test путь, возвращает `WorkflowResult`
+3. **HTTP `/enqueue`** — валидация задачи и публикация в RabbitMQ, статус `queued`
+4. **HTTP `/run/debug`** — debug-путь с результатами шагов (`intent_parser` и др.)
 
-## Debug workflow run
+## Debug-запуск
 
-Use `POST /api/v1/workflow/run/debug` to inspect intermediate service results.
+Используйте `POST /api/v1/workflow/run/debug` для просмотра промежуточных результатов сервисов.
 
-### Intent parser only (fastest)
+### Только intent parser (быстрее всего)
 
 ```powershell
 Invoke-RestMethod -Method Post `
@@ -38,13 +38,13 @@ Invoke-RestMethod -Method Post `
   -ContentType "application/json" -Body $body
 ```
 
-Response includes:
+Ответ содержит:
 
-- `intent_parser` — full `IntentParserResponse` as JSON
-- `steps[]` — per-step `status`, `duration_ms`, `request_summary`, `response_valid`, `result`
-- downstream steps (`build_context`, `run_analytics`, `generate_response`) stay `not_run`
+- `intent_parser` — полный `IntentParserResponse` в JSON
+- `steps[]` — `status`, `duration_ms`, `request_summary`, `response_valid`, `result` по шагам
+- downstream-шаги (`build_context`, `run_analytics`, `generate_response`) остаются `not_run`
 
-### Full pipeline debug
+### Полный pipeline debug
 
 ```powershell
 Invoke-RestMethod -Method Post `
@@ -52,11 +52,11 @@ Invoke-RestMethod -Method Post `
   -ContentType "application/json" -Body $body
 ```
 
-Returns debug metadata for every HTTP step that completed before clarification/failure/completion.
+Возвращает debug-метаданные для каждого HTTP-шага до clarification/ошибки/завершения.
 
-## HTTP trigger examples
+## Примеры HTTP-запросов
 
-Request body (shared by `/run` and `/enqueue`):
+Тело запроса (общее для `/run` и `/enqueue`):
 
 ```json
 {
@@ -70,9 +70,9 @@ Request body (shared by `/run` and `/enqueue`):
 }
 ```
 
-If `workflow_run_id`, `message_id`, or `created_at` are omitted, the service generates them automatically.
+Если `workflow_run_id`, `message_id` или `created_at` не указаны — сервис генерирует их автоматически.
 
-### Sync run (dev, no RabbitMQ required)
+### Синхронный запуск (dev, RabbitMQ не нужен)
 
 PowerShell:
 
@@ -100,7 +100,7 @@ curl -X POST http://127.0.0.1:8010/api/v1/workflow/run \
   -d '{"request_id":"req_001","workflow_run_id":"run_001","user_id":"user_123","chat_id":"chat_001","raw_message":"Куда уходят деньги?","current_date":"2026-05-30","timezone":"Europe/Moscow"}'
 ```
 
-### Batch sync run
+### Batch-синхронный запуск
 
 ```powershell
 $body = @{
@@ -131,7 +131,7 @@ Invoke-RestMethod -Method Post `
   -ContentType "application/json" -Body $body
 ```
 
-### Enqueue to RabbitMQ (production-like)
+### Постановка в очередь RabbitMQ (production-like)
 
 ```powershell
 Invoke-RestMethod -Method Post `
@@ -139,7 +139,7 @@ Invoke-RestMethod -Method Post `
   -ContentType "application/json" -Body $body
 ```
 
-Response example:
+Пример ответа:
 
 ```json
 {
@@ -152,20 +152,20 @@ Response example:
 }
 ```
 
-Watch logs:
+Логи:
 
 ```bash
 make logs-ai-workflow-service
 make logs-llm-intent-parser-service
 ```
 
-Docker rebuild after code changes:
+Пересборка Docker после изменений кода:
 
 ```bash
 docker compose -f docker-compose.dev.yml up -d --build ai-workflow-service
 ```
 
-## Configuration
+## Конфигурация
 
 ```env
 AI_WORKFLOW_ENABLE_HTTP_TRIGGER=true
@@ -173,9 +173,12 @@ AI_WORKFLOW_ENABLE_RABBITMQ_CONSUMER=true
 INTENT_PARSER_SERVICE_URL=http://llm-intent-parser-service:8011
 ```
 
-Set `AI_WORKFLOW_ENABLE_HTTP_TRIGGER=false` to disable HTTP trigger endpoints.
+`AI_WORKFLOW_ENABLE_HTTP_TRIGGER=false` отключает HTTP trigger-эндпоинты.
 
 ## Backend Chat
 
-Backend / Chat integration uses `BackendChatClient` port with `MockBackendChatClient` in Phase 03.
-HTTP implementation is deferred to Phase 08.
+Интеграция с Backend / Chat через порт `BackendChatClient`. Сейчас используется `MockBackendChatClient` (in-memory). HTTP-реализация — в планах.
+
+## Статус
+
+Ядро реализовано: LangGraph-граф, RabbitMQ, HTTP API, клиенты downstream, clarification, debug runner. Backend Chat — mock.

@@ -1,6 +1,8 @@
 # shared_http
 
-Shared HTTP client utilities.
+Общий HTTP-клиент для межсервисных вызовов.
 
-Import: `shared_http`  
-Path: `packages/shared_http/`
+Импорт: `shared_http`  
+Путь: `packages/shared_http/`
+
+`ServiceHttpClient` — retry, таймауты, типизированные ошибки. Используется в ai-workflow-service для вызовов downstream-сервисов.

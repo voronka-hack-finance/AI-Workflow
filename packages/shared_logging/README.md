@@ -1,6 +1,8 @@
 # shared_logging
 
-Shared logging utilities.
+Общие утилиты логирования.
 
-Import: `shared_logging`  
-Path: `packages/shared_logging/`
+Импорт: `shared_logging`  
+Путь: `packages/shared_logging/`
+
+`get_logger()` — thin wrapper над стандартным logging. Пока не подключён в сервисах (каждый сервис использует свой `app/core/logging.py`).

@@ -1,8 +1,8 @@
 # AI Context Builder Service
 
-Builds context package and execution plan from intent.
+Собирает context package и execution plan на основе intent.
 
-## Run locally
+## Локальный запуск
 
 ```bash
 uv sync
@@ -11,11 +11,13 @@ uv run pytest
 uv run ruff check .
 ```
 
-## Endpoints
+## Эндпоинты
 
-- `GET /health` — health check
-- `POST /api/v1/context/build` — main API (skeleton)
+- `GET /health` — проверка здоровья
+- `POST /api/v1/context/build` — основной API (заглушка)
 
-## Status
+## Статус
 
-Skeleton only — business logic marked with `TODO`.
+Каркас: FastAPI, Pydantic-схемы (`ContextPackage`, normalized data, category profile), структура модулей (`builder/`, `planning/`, `data_clients/`, `data_adapters/`).
+
+`POST /context/build` возвращает stub-ответ. Бизнес-логика (`ContextBuilderService`, data clients, mappers) — в TODO.

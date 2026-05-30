@@ -1,6 +1,8 @@
 # shared_config
 
-Shared configuration base settings.
+Базовые настройки сервисов.
 
-Import: `shared_config`  
-Path: `packages/shared_config/`
+Импорт: `shared_config`  
+Путь: `packages/shared_config/`
+
+`BaseServiceSettings` — общий базовый класс для Pydantic Settings. Пока не используется сервисами (у каждого свой `Settings`).
