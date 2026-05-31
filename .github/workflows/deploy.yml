@@ -84,32 +84,48 @@ jobs:
 
       - name: Deploy on server
         uses: appleboy/ssh-action@v1
+        env:
+          AI_APP_DIR: ${{ secrets.AI_APP_DIR }}
+          AI_PRODUCTION_ENV: ${{ secrets.AI_PRODUCTION_ENV }}
+          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
+          GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
+          OLLAMA_MODEL: ${{ secrets.OLLAMA_MODEL }}
         with:
           host: ${{ secrets.AI_HOST }}
           username: ${{ secrets.AI_USER }}
           key: ${{ secrets.AI_SSH_KEY }}
+          envs: AI_APP_DIR,AI_PRODUCTION_ENV,GHCR_TOKEN,GHCR_USERNAME,OLLAMA_MODEL
           script: |
-            set -e
+            set -euo pipefail
 
-            cd "${{ secrets.AI_APP_DIR }}"
+            cd "${AI_APP_DIR}"
 
-            cat > .env.production <<'EOF'
-            ${{ secrets.AI_PRODUCTION_ENV }}
-            EOF
+            printf '%s\n' "${AI_PRODUCTION_ENV}" > .env.production
+            chmod 600 .env.production
 
-            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USERNAME }}" --password-stdin
+            echo "${GHCR_TOKEN}" | docker login ghcr.io -u "${GHCR_USERNAME}" --password-stdin
 
             docker compose -f docker-compose.prod.yml --env-file .env.production pull
             docker compose -f docker-compose.prod.yml --env-file .env.production up -d --remove-orphans
 
+            if [ -n "${OLLAMA_MODEL:-}" ]; then
+              echo "Ensuring Ollama model: ${OLLAMA_MODEL}"
+              for i in $(seq 1 30); do
+                if docker exec ollama ollama list >/dev/null 2>&1; then
+                  break
+                fi
+                sleep 5
+              done
+              docker exec ollama ollama pull "${OLLAMA_MODEL}" || true
+            fi
+
             docker image prune -f
 
-            echo "Checking health endpoints..."
+            echo "Waiting for services..."
+            sleep 20
 
-            sleep 10
-
-            curl -f http://127.0.0.1:8010/health
-            curl -f http://127.0.0.1:8011/health
-            curl -f http://127.0.0.1:8012/health
-            curl -f http://127.0.0.1:8013/health
-            curl -f http://127.0.0.1:8014/health
+            curl -fsS http://127.0.0.1:8010/health
+            curl -fsS http://127.0.0.1:8011/health
+            curl -fsS http://127.0.0.1:8012/health
+            curl -fsS http://127.0.0.1:8013/health
+            curl -fsS http://127.0.0.1:8014/health
