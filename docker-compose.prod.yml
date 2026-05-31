@@ -12,24 +12,6 @@ x-healthcheck-defaults: &healthcheck-defaults
   start_period: 20s
 
 services:
-  rabbitmq:
-    image: rabbitmq:3-management
-    container_name: ai-rabbitmq
-    restart: unless-stopped
-    ports:
-      - "5672:5672"
-      - "127.0.0.1:15672:15672"
-    environment:
-      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
-      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-      - ./infra/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
-      - ./infra/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
-    healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "ping"]
-      <<: *healthcheck-defaults
-
   llm-intent-parser-service:
     <<: *env-files
     image: ${REGISTRY}/${IMAGE_OWNER}/llm-intent-parser-service:${IMAGE_TAG}
@@ -61,13 +43,8 @@ services:
       - "127.0.0.1:8012:8012"
     environment:
       CONTEXT_BUILDER_DATA_PROVIDER: rabbitmq
-
-      # На всякий случай оставляем оба варианта.
-      # Если код читает BACKEND_RABBITMQ_URL — будет работать.
-      # Если код читает RABBITMQ_URL, как в dev compose, тоже будет работать.
       BACKEND_RABBITMQ_URL: ${BACKEND_RABBITMQ_URL}
       RABBITMQ_URL: ${BACKEND_RABBITMQ_URL}
-
       RABBITMQ_BACKEND_DATA_REQUEST_QUEUE: ${RABBITMQ_BACKEND_DATA_REQUEST_QUEUE}
       RABBITMQ_BACKEND_DATA_RESPONSE_QUEUE: ${RABBITMQ_BACKEND_DATA_RESPONSE_QUEUE}
       CONTEXT_BUILDER_BACKEND_DATA_TIMEOUT_SECONDS: ${CONTEXT_BUILDER_BACKEND_DATA_TIMEOUT_SECONDS}
@@ -132,23 +109,18 @@ services:
       RABBITMQ_WORKFLOW_QUEUE: ${RABBITMQ_WORKFLOW_QUEUE}
       RABBITMQ_WORKFLOW_RESULT_QUEUE: ${RABBITMQ_WORKFLOW_RESULT_QUEUE}
       RABBITMQ_PREFETCH_COUNT: ${RABBITMQ_PREFETCH_COUNT}
-
       AI_WORKFLOW_ENABLE_RABBITMQ_CONSUMER: ${AI_WORKFLOW_ENABLE_RABBITMQ_CONSUMER}
       AI_WORKFLOW_ENABLE_HTTP_TRIGGER: ${AI_WORKFLOW_ENABLE_HTTP_TRIGGER}
       AI_WORKFLOW_MAX_CONCURRENT_RUNS: ${AI_WORKFLOW_MAX_CONCURRENT_RUNS}
-
       INTENT_PARSER_SERVICE_URL: ${INTENT_PARSER_SERVICE_URL}
       CONTEXT_BUILDER_SERVICE_URL: ${CONTEXT_BUILDER_SERVICE_URL}
       ANALYTICS_SERVICE_URL: ${ANALYTICS_SERVICE_URL}
       RESPONSE_AGENT_SERVICE_URL: ${RESPONSE_AGENT_SERVICE_URL}
-
       AI_WORKFLOW_HTTP_TIMEOUT_SECONDS: ${AI_WORKFLOW_HTTP_TIMEOUT_SECONDS}
       INTENT_PARSER_HTTP_TIMEOUT_SECONDS: ${INTENT_PARSER_HTTP_TIMEOUT_SECONDS}
       RESPONSE_AGENT_HTTP_TIMEOUT_SECONDS: ${RESPONSE_AGENT_HTTP_TIMEOUT_SECONDS}
       AI_WORKFLOW_HTTP_MAX_RETRIES: ${AI_WORKFLOW_HTTP_MAX_RETRIES}
     depends_on:
-      rabbitmq:
-        condition: service_healthy
       llm-intent-parser-service:
         condition: service_healthy
       ai-context-builder-service:
@@ -175,5 +147,4 @@ services:
       - ollama_data:/root/.ollama
 
 volumes:
-  rabbitmq_data:
   ollama_data:

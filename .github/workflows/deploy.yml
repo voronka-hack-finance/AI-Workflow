@@ -73,20 +73,37 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Copy production compose files to server
+      - name: Prepare production env file
+        env:
+          IMAGE_OWNER: ${{ github.repository_owner }}
+          PRODUCTION_ENV_OVERRIDE: ${{ secrets.AI_PRODUCTION_ENV }}
+        run: |
+          set -euo pipefail
+          owner="$(echo "${IMAGE_OWNER}" | tr '[:upper:]' '[:lower:]')"
+          cp .env.production.example .env.production
+          sed -i "s/^IMAGE_OWNER=.*/IMAGE_OWNER=${owner}/" .env.production
+          if [ -n "${PRODUCTION_ENV_OVERRIDE}" ]; then
+            printf '\n%s\n' "${PRODUCTION_ENV_OVERRIDE}" >> .env.production
+          fi
+          for key in REGISTRY IMAGE_OWNER IMAGE_TAG RABBITMQ_URL BACKEND_RABBITMQ_URL; do
+            grep -q "^${key}=" .env.production || { echo "Missing ${key} in .env.production"; exit 1; }
+          done
+          grep -q '^REGISTRY=ghcr.io' .env.production
+          echo "Prepared .env.production ($(wc -l < .env.production) lines)"
+
+      - name: Copy production files to server
         uses: appleboy/scp-action@v1
         with:
           host: ${{ secrets.AI_HOST }}
           username: ${{ secrets.AI_USER }}
           key: ${{ secrets.AI_SSH_KEY }}
-          source: "docker-compose.prod.yml,infra/rabbitmq/rabbitmq.conf,infra/rabbitmq/definitions.json"
+          source: "docker-compose.prod.yml,.env.production"
           target: ${{ secrets.AI_APP_DIR }}
 
       - name: Deploy on server
         uses: appleboy/ssh-action@v1
         env:
           AI_APP_DIR: ${{ secrets.AI_APP_DIR }}
-          AI_PRODUCTION_ENV: ${{ secrets.AI_PRODUCTION_ENV }}
           GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
           GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
           OLLAMA_MODEL: ${{ secrets.OLLAMA_MODEL }}
@@ -94,13 +111,11 @@ jobs:
           host: ${{ secrets.AI_HOST }}
           username: ${{ secrets.AI_USER }}
           key: ${{ secrets.AI_SSH_KEY }}
-          envs: AI_APP_DIR,AI_PRODUCTION_ENV,GHCR_TOKEN,GHCR_USERNAME,OLLAMA_MODEL
+          envs: AI_APP_DIR,GHCR_TOKEN,GHCR_USERNAME,OLLAMA_MODEL
           script: |
             set -euo pipefail
 
             cd "${AI_APP_DIR}"
-
-            printf '%s\n' "${AI_PRODUCTION_ENV}" > .env.production
             chmod 600 .env.production
 
             echo "${GHCR_TOKEN}" | docker login ghcr.io -u "${GHCR_USERNAME}" --password-stdin
