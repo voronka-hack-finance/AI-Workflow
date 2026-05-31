@@ -1,9 +1,13 @@
 # shared_contracts
 
-Общие Pydantic-контракты для AI-сервисов.
+Общие Pydantic-контракты для AI-сервисов и RabbitMQ-сообщений.
+
+**Статус: ✅ готово.**
 
 Имя пакета: `shared-contracts`  
 Импорт: `shared_contracts`
+
+---
 
 ## Структура
 
@@ -21,7 +25,7 @@ packages/shared_contracts/
 └── README.md
 ```
 
-Модули лежат непосредственно в `packages/shared_contracts/` — без вложенной дублирующей папки.
+---
 
 ## Использование
 
@@ -31,6 +35,8 @@ packages/shared_contracts/
 cd ai-workflow-service
 uv run pytest ../packages/shared_contracts/tests -q
 ```
+
+---
 
 ## Проверка импорта
 
