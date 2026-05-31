@@ -1,6 +1,6 @@
 # Analytics Service
 
-Выполняет функции execution plan над context package.
+Выполняет analytics functions над Context Package и возвращает `FinancialAnalysisResult`.
 
 ## Локальный запуск
 
@@ -14,10 +14,21 @@ uv run ruff check .
 ## Эндпоинты
 
 - `GET /health` — проверка здоровья
-- `POST /api/v1/analytics/run` — основной API (заглушка)
+- `POST /api/v1/analytics/run` — принимает `ContextPackage`, возвращает `FinancialAnalysisResult`
 
-## Статус
+## Env
 
-Каркас: FastAPI, 14 analytics functions как классы-заглушки, `AnalyticsEngine`, `ExecutionPlanRunner`, scoring/helpers — в TODO.
+```env
+ANALYTICS_SERVICE_NAME=analytics-service
+ANALYTICS_SERVICE_PORT=8013
+ANALYTICS_RULES_VERSION=v1.0
+ANALYTICS_DEFAULT_CURRENCY=RUB
+```
 
-`POST /analytics/run` возвращает stub-ответ. Реализована утилита `safe_divide()` в `helpers/safe_math.py`.
+## Архитектура
+
+```text
+ContextPackage → AnalyticsRunner → ExecutionPlanRunner → functions → FinancialAnalysisResult
+```
+
+Сервис не вызывает LLM и не обращается к backend.

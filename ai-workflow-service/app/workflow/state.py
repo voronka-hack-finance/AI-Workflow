@@ -19,7 +19,6 @@ class WorkflowGraphState(TypedDict, total=False):
     context_package: ContextPackage | None
     analysis_result: FinancialAnalysisResult | None
     response_result: ResponseAgentResult | None
-    clarification_question: str | None
     final_answer: str | None
     error: BaseException | None
     workflow_status: WorkflowStatus

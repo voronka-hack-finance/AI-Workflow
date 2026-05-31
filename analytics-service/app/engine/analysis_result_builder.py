@@ -1,6 +1,4 @@
-"""AnalysisResultBuilder."""
+"""Re-export AnalysisResultBuilder from builders package."""
+from app.builders.analysis_result_builder import AnalysisResultBuilder
 
-
-class AnalysisResultBuilder:
-    # TODO: implement
-    pass
+__all__ = ["AnalysisResultBuilder"]

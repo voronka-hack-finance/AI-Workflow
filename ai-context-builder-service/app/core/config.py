@@ -11,9 +11,13 @@ class Settings(BaseSettings):
 
     app_env: str = "development"
     service_port: int = 8012
+    context_builder_data_provider: str = "mock"
+    context_builder_backend_data_timeout_seconds: float = 30.0
+    rabbitmq_url: str = "amqp://guest:guest@localhost:5673/"
+    rabbitmq_backend_data_request_queue: str = "ai.backend.data.requests"
+    rabbitmq_backend_data_response_queue: str = "ai.context_builder.backend_data.responses"
 
 
 @lru_cache
 def get_settings() -> Settings:
-    # TODO: validate required secrets in production
     return Settings()

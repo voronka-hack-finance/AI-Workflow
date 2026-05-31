@@ -230,9 +230,3 @@ def normalize_focus_category(payload: dict[str, Any]) -> None:
     if resolved.needs_clarification:
         focus["category"] = None
         focus["categories"] = []
-        payload["clarification"] = {
-            "required": True,
-            "reason": "ambiguous_request",
-            "missing_fields": ["focus.categories"],
-            "question": resolved.question or CATEGORY_CLARIFICATION_QUESTION,
-        }

@@ -1,6 +1,4 @@
-"""ExecutionPlanRunner."""
+"""Re-export ExecutionPlanRunner from runner package."""
+from app.runner.execution_plan_runner import ExecutionPlanRunner
 
-
-class ExecutionPlanRunner:
-    # TODO: implement
-    pass
+__all__ = ["ExecutionPlanRunner"]

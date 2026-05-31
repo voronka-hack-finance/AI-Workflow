@@ -102,6 +102,20 @@ async def test_intent_parser_client_uses_longer_timeout(settings: Settings) -> N
 
 
 @pytest.mark.asyncio
+async def test_response_agent_client_uses_longer_timeout(settings: Settings) -> None:
+    settings = Settings(
+        response_agent_service_url="http://response-agent.test",
+        ai_workflow_http_timeout_seconds=30.0,
+        response_agent_http_timeout_seconds=300.0,
+        ai_workflow_http_max_retries=2,
+    )
+    from app.clients.response_agent_client import ResponseAgentClient
+
+    client = ResponseAgentClient(settings)
+    assert client._http._timeout == 300.0
+
+
+@pytest.mark.asyncio
 async def test_contract_validation_error(settings: Settings) -> None:
     client = IntentParserClient(settings)
 

@@ -1,11 +1,8 @@
 """HabitCoachAgent."""
 from app.agents.base_agent import BaseAgent
-from app.schemas.agent_output import AgentOutput
+from app.prompts.habit_coach_prompt import build_habit_coach_messages
 
 
 class HabitCoachAgent(BaseAgent):
-    name = "habitcoach"
-
-    async def run(self, context: dict) -> AgentOutput:
-        # TODO: implement LLM call
-        return AgentOutput(agent_name=self.name)
+    name = "habit_coach"
+    build_messages = staticmethod(build_habit_coach_messages)

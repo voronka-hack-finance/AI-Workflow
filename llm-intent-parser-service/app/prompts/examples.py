@@ -107,12 +107,6 @@ FEW_SHOT_EXAMPLES += _pair(
         "intent_confidence": 0.88,
         "requested_functions": ["goal_analysis"],
         "goal": {"name": "ноутбук", "amount": None, "deadline_months": None},
-        "clarification": {
-            "required": True,
-            "reason": "missing_required_data",
-            "missing_fields": ["goal.amount", "goal.deadline_months"],
-            "question": "На какую сумму и за какой срок ты хочешь накопить на ноутбук?",
-        },
     },
 )
 FEW_SHOT_EXAMPLES += _pair(

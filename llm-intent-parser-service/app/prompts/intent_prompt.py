@@ -45,16 +45,13 @@ Default values:
 - focus.direction = "income" for income requests;
 - focus.direction = "all" for general finance requests.
 
+Clarification rule:
+- clarification.required must ALWAYS be false;
+- clarification.reason = null, missing_fields = [], question = null.
+
 Intent priority rules:
 
-1. active_workflow clarification
-If active_workflow.status = "awaiting_user_input":
-treat raw_message as an answer to the previous clarification.
-Use previous active_workflow.intent_result as base.
-Fill missing fields only.
-Do not start a new request unless user clearly changes topic.
-
-2. category-specific spending
+1. category-specific spending
 If user asks about spending in a specific category, use category_analysis, not expense_breakdown.
 
 Examples:
@@ -71,7 +68,7 @@ focus.category = detected category when exactly one category
 focus.categories = list of canonical categories when one or more categories are detected
 focus.direction = "expense"
 
-3. generic expense breakdown
+2. generic expense breakdown
 Use expense_breakdown only for general expense questions without a specific category.
 
 Examples:
@@ -80,13 +77,17 @@ Examples:
 "покажи структуру расходов"
 "мои расходы за месяц"
 
-4. saving / what-to-do / reduce spending
+3. saving / what-to-do / reduce spending
 If user asks what to do, how to save money, spend less, reduce expenses, or improve finances:
 
 primary_intent = "action_plan"
 intents = ["action_plan", "budget_recommendation"]
 requested_functions = ["action_plan", "budget_recommendation"]
 recommendation_horizon = "next_7_days"
+clarification.required = false
+
+Do NOT ask for goal.amount or goal.deadline_months here.
+Context Builder can run action_plan and budget_recommendation without a savings target.
 
 Examples:
 "что мне делать чтобы сэкономить финансы"
@@ -94,23 +95,23 @@ Examples:
 "дай шаги чтобы меньше тратить"
 "как улучшить финансовое состояние"
 
-5. budget recommendation
+4. budget recommendation
 If user asks for budget advice, budget optimization, or recommendation:
 requested_functions = ["budget_recommendation"]
 primary_intent = "budget_recommendation"
 
 If user also asks for concrete steps, include action_plan.
 
-6. goal analysis
+5. goal analysis
 If user asks whether they can save for a goal or buy something by a deadline:
 requested_functions = ["goal_analysis"]
 primary_intent = "goal_analysis"
 recommendation_horizon = "goal_deadline"
 
-Extract goal.name, goal.amount, goal.deadline_months.
-If goal.amount or goal.deadline_months is missing, ask clarification.
+Extract goal.name, goal.amount, goal.deadline_months when present.
+Do NOT ask for missing goal fields.
 
-7. budget plan
+6. budget plan
 If user asks for a plan, limits, daily budget, or plan until salary/week/month:
 requested_functions = ["budget_plan"]
 primary_intent = "budget_plan"
@@ -120,7 +121,7 @@ Set budget_plan.horizon:
 "на неделю" -> "next_7_days"
 "на месяц" -> "next_month"
 
-8. debt / credit
+7. debt / credit
 If user asks about debt, loans, credit load, or credit history:
 debt.requested = true.
 
@@ -132,13 +133,13 @@ If user asks what to do or how to improve:
 requested_functions = ["debt_analysis", "action_plan"]
 primary_intent = "action_plan"
 
-9. emergency fund
+8. emergency fund
 If user asks about emergency fund, reserve, financial cushion, or financial safety:
 requested_functions = ["emergency_fund_analysis"]
 primary_intent = "emergency_fund_analysis"
 emergency_fund.requested = true
 
-10. comparison
+9. comparison
 If user asks whether spending increased, changed, or asks to compare:
 comparison.enabled = true.
 Use comparison.type = "previous_period" unless a specific previous week/month is mentioned.
@@ -154,13 +155,6 @@ exact dates -> custom
 Follow-up rules:
 If raw_message is short like "а за неделю?", "а вчера?", "а за месяц?",
 use last_6_messages/chat_summary to keep the previous intent and only change period.
-
-Clarification rules:
-Ask clarification only for missing semantic fields:
-- goal.amount
-- goal.deadline_months
-- focus.category for category_analysis
-- budget_plan.horizon for budget_plan
 
 Do NOT ask for backend data:
 transactions, current_savings, income, balances, debts, category_profiles.

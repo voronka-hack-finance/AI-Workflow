@@ -1,4 +1,4 @@
-.PHONY: dev-up dev-down up down logs test sync lock
+.PHONY: dev-up dev-down up down logs test sync lock context-builder-local
 
 SERVICES := ai-workflow-service llm-intent-parser-service ai-context-builder-service analytics-service llm-response-agent-service
 COMPOSE := docker compose -f docker-compose.dev.yml
@@ -30,6 +30,9 @@ logs-%:
 dev-up: up
 
 dev-down: down
+
+context-builder-local:
+	cd ai-context-builder-service && uv run uvicorn app.main:app --reload --host 0.0.0.0 --port 8012
 
 test:
 	@echo "==> packages/shared_contracts"

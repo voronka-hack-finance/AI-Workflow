@@ -1,11 +1,8 @@
 """BudgetPlannerAgent."""
 from app.agents.base_agent import BaseAgent
-from app.schemas.agent_output import AgentOutput
+from app.prompts.budget_planner_prompt import build_budget_planner_messages
 
 
 class BudgetPlannerAgent(BaseAgent):
-    name = "budgetplanner"
-
-    async def run(self, context: dict) -> AgentOutput:
-        # TODO: implement LLM call
-        return AgentOutput(agent_name=self.name)
+    name = "budget_planner"
+    build_messages = staticmethod(build_budget_planner_messages)

@@ -80,8 +80,8 @@ def test_normalizes_local_llm_schema_mistakes() -> None:
     assert result.budget_plan.horizon is None
     assert result.style.agent_style == "balanced"
     assert result.constraints.protected_categories == []
-    assert result.clarification.required is True
-    assert result.clarification.question == "Какие именно кредиты вас беспокоят?"
+    assert result.clarification.required is False
+    assert result.clarification.question is None
 
 
 def test_normalizes_clarification_field_paths_and_null_fields() -> None:
@@ -97,9 +97,26 @@ def test_normalizes_clarification_field_paths_and_null_fields() -> None:
             "clarification": ["goal.amount", "goal.deadline_months"],
         }
     )
-    assert result.clarification.required is True
-    assert result.clarification.missing_fields == ["goal.amount", "goal.deadline_months"]
-    assert "сумму" in (result.clarification.question or "")
+    assert result.clarification.required is False
+    assert result.clarification.missing_fields == []
+
+
+def test_strips_goal_clarification_for_action_plan() -> None:
+    result = validate_intent_payload(
+        {
+            "primary_intent": "action_plan",
+            "intents": ["action_plan", "budget_recommendation"],
+            "requested_functions": ["action_plan", "budget_recommendation"],
+            "clarification": {
+                "required": True,
+                "reason": "Goal amount is missing.",
+                "missing_fields": ["goal.amount"],
+                "question": "How much money are you trying to save?",
+            },
+        }
+    )
+    assert result.clarification.required is False
+    assert result.clarification.missing_fields == []
 
 
 def test_normalizes_income_analysis_payload() -> None:
@@ -147,8 +164,8 @@ def test_normalizes_clarification_object_array() -> None:
             ],
         }
     )
-    assert result.clarification.required is True
-    assert result.clarification.missing_fields == ["goal.amount"]
+    assert result.clarification.required is False
+    assert result.clarification.missing_fields == []
 
 
 def test_combined_category_value_normalizes_to_all() -> None:

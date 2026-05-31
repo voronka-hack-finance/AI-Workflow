@@ -1,11 +1,8 @@
 """SafetyAgent."""
 from app.agents.base_agent import BaseAgent
-from app.schemas.agent_output import AgentOutput
+from app.prompts.safety_agent_prompt import build_safety_agent_messages
 
 
 class SafetyAgent(BaseAgent):
     name = "safety"
-
-    async def run(self, context: dict) -> AgentOutput:
-        # TODO: implement LLM call
-        return AgentOutput(agent_name=self.name)
+    build_messages = staticmethod(build_safety_agent_messages)

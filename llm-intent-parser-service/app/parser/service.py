@@ -6,7 +6,6 @@ from app.core.errors import LLMParseError
 from app.llm.base import LLMProvider
 from app.llm.mock_provider import MockProvider
 from app.llm.provider_factory import create_llm_provider
-from app.parser.clarification import merge_clarification_answer
 from app.parser.message_hints import apply_message_hints
 from app.parser.json_parser import parse_llm_json
 from app.parser.validator import validate_intent_payload
@@ -36,7 +35,6 @@ class IntentParserService:
             payload = parse_llm_json(raw_output)
             intent_result = validate_intent_payload(payload)
             intent_result = apply_message_hints(request, intent_result)
-            intent_result = merge_clarification_answer(request, intent_result)
         except LLMParseError:
             raise
         except Exception as exc:  # noqa: BLE001 - surface provider failures consistently

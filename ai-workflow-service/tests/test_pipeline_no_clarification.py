@@ -1,4 +1,4 @@
-"""Clarification flow tests."""
+"""Pipeline continues without clarification stops."""
 from __future__ import annotations
 
 from unittest.mock import AsyncMock
@@ -45,67 +45,23 @@ def _orchestrator(
 
 
 @pytest.mark.asyncio
-async def test_intent_clarification_stops_pipeline(
+async def test_pipeline_continues_when_clarification_signals_present(
     backend_chat: MockBackendChatClient,
     task: WorkflowTask,
 ) -> None:
     orchestrator = _orchestrator(
         backend_chat,
         intent=minimal_intent_response(clarification_required=True),
-    )
-
-    result = await orchestrator.run_workflow(task)
-
-    assert result.status == WorkflowStatus.AWAITING_USER_INPUT
-    assert backend_chat.clarifications[-1].question == "Какой период вас интересует?"
-    orchestrator._context_builder.build_context.assert_not_awaited()
-
-
-@pytest.mark.asyncio
-async def test_context_clarification_stops_before_analytics(
-    backend_chat: MockBackendChatClient,
-    task: WorkflowTask,
-) -> None:
-    orchestrator = _orchestrator(
-        backend_chat,
         context=minimal_context_package(can_run_analytics=False),
-    )
-
-    result = await orchestrator.run_workflow(task)
-
-    assert result.status == WorkflowStatus.AWAITING_USER_INPUT
-    assert backend_chat.clarifications
-    orchestrator._analytics.run_analysis.assert_not_awaited()
-
-
-@pytest.mark.asyncio
-async def test_analytics_clarification_stops_before_response_agent(
-    backend_chat: MockBackendChatClient,
-    task: WorkflowTask,
-) -> None:
-    orchestrator = _orchestrator(
-        backend_chat,
         analysis=minimal_analysis_result(needs_clarification=True),
-    )
-
-    result = await orchestrator.run_workflow(task)
-
-    assert result.status == WorkflowStatus.AWAITING_USER_INPUT
-    assert "Нужны данные о цели" in backend_chat.clarifications[-1].question
-    orchestrator._response_agent.generate_response.assert_not_awaited()
-
-
-@pytest.mark.asyncio
-async def test_response_agent_clarification_stops_before_final_answer(
-    backend_chat: MockBackendChatClient,
-    task: WorkflowTask,
-) -> None:
-    orchestrator = _orchestrator(
-        backend_chat,
         response=minimal_response_result(needs_clarification=True),
     )
 
     result = await orchestrator.run_workflow(task)
 
-    assert result.status == WorkflowStatus.AWAITING_USER_INPUT
-    assert not backend_chat.final_answers
+    assert result.status == WorkflowStatus.COMPLETED
+    assert backend_chat.clarifications == []
+    assert backend_chat.final_answers
+    orchestrator._context_builder.build_context.assert_awaited_once()
+    orchestrator._analytics.run_analysis.assert_awaited_once()
+    orchestrator._response_agent.generate_response.assert_awaited_once()

@@ -1,0 +1,147 @@
+{
+  "default": {
+    "transactions": [
+      {
+        "id": "tx_1",
+        "sum": -1294,
+        "currency": "RUB",
+        "type": "OUT",
+        "merchantName": "Вкусно — и точка",
+        "bankCategory": "Фастфуд",
+        "mccCode": "5814",
+        "date": "2026-05-10T18:25:00"
+      },
+      {
+        "id": "tx_2",
+        "sum": 85000,
+        "currency": "RUB",
+        "type": "IN",
+        "merchantName": "Зарплата",
+        "bankCategory": "Зарплата",
+        "mccCode": null,
+        "date": "2026-05-05T10:00:00"
+      },
+      {
+        "id": "tx_3",
+        "sum": -3500,
+        "currency": "RUB",
+        "type": "OUT",
+        "merchantName": "Пятёрочка",
+        "bankCategory": "Продукты",
+        "mccCode": "5411",
+        "date": "2026-05-12T14:30:00"
+      }
+    ],
+    "previous_period_transactions": [
+      {
+        "id": "tx_prev_1",
+        "sum": -980,
+        "currency": "RUB",
+        "type": "OUT",
+        "merchantName": "Вкусно — и точка",
+        "bankCategory": "Фастфуд",
+        "mccCode": "5814",
+        "date": "2026-04-15T18:25:00"
+      }
+    ],
+    "user_context": {
+      "currentSavings": 45000,
+      "stableMonthlyIncome": 85000,
+      "hasDebt": false,
+      "monthlyDebtPayment": null,
+      "debtAmount": null,
+      "financialGoal": null,
+      "goalAmount": null,
+      "goalDeadlineMonths": null,
+      "salaryDay": 5,
+      "currentBalance": 52000
+    },
+    "category_profiles": [
+      {
+        "category": "Фастфуд",
+        "categoryGroup": "food_outside",
+        "canOptimize": true,
+        "protectedByDefault": false,
+        "isRequiredExpense": false
+      },
+      {
+        "category": "Продукты",
+        "categoryGroup": "essential_variable",
+        "canOptimize": true,
+        "protectedByDefault": false,
+        "isRequiredExpense": true
+      }
+    ]
+  },
+  "missing_savings": {
+    "transactions": [
+      {
+        "id": "tx_1",
+        "sum": -1294,
+        "currency": "RUB",
+        "type": "OUT",
+        "merchantName": "Вкусно — и точка",
+        "bankCategory": "Фастфуд",
+        "mccCode": "5814",
+        "date": "2026-05-10T18:25:00"
+      }
+    ],
+    "previous_period_transactions": [],
+    "user_context": {
+      "currentSavings": null,
+      "stableMonthlyIncome": 85000,
+      "hasDebt": false,
+      "monthlyDebtPayment": null,
+      "debtAmount": null,
+      "financialGoal": null,
+      "goalAmount": null,
+      "goalDeadlineMonths": null,
+      "salaryDay": 5,
+      "currentBalance": 52000
+    },
+    "category_profiles": [
+      {
+        "category": "Фастфуд",
+        "categoryGroup": "food_outside",
+        "canOptimize": true,
+        "protectedByDefault": false,
+        "isRequiredExpense": false
+      }
+    ]
+  },
+  "unmapped_category": {
+    "transactions": [
+      {
+        "id": "tx_amb",
+        "sum": -500,
+        "currency": "RUB",
+        "type": "OUT",
+        "merchantName": "Unknown Shop",
+        "bankCategory": "Неизвестная категория",
+        "mccCode": null,
+        "date": "2026-05-11T12:00:00",
+        "ambiguous": true
+      }
+    ],
+    "previous_period_transactions": [],
+    "user_context": {
+      "currentSavings": 10000,
+      "stableMonthlyIncome": 50000,
+      "hasDebt": false,
+      "monthlyDebtPayment": null,
+      "debtAmount": null,
+      "financialGoal": null,
+      "goalAmount": null,
+      "goalDeadlineMonths": null,
+      "salaryDay": 1,
+      "currentBalance": 15000
+    },
+    "category_profiles": []
+  },
+  "empty": {
+    "transactions": [],
+    "previous_period_transactions": [],
+    "user_context": {},
+    "category_profiles": []
+  }
+}

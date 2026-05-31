@@ -1,6 +1,4 @@
-"""AnalyticsEngine."""
+"""Backward-compatible alias for AnalyticsRunner."""
+from app.runner.analytics_runner import AnalyticsRunner
 
-
-class AnalyticsEngine:
-    # TODO: implement
-    pass
+AnalyticsEngine = AnalyticsRunner

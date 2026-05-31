@@ -101,7 +101,7 @@ def test_llm_categories_array_is_merged() -> None:
     assert result.focus.category is None
 
 
-def test_unknown_llm_category_requests_clarification() -> None:
+def test_unknown_llm_category_clears_focus_without_clarification() -> None:
     result = validate_intent_payload(
         {
             "primary_intent": "category_analysis",
@@ -111,5 +111,5 @@ def test_unknown_llm_category_requests_clarification() -> None:
     )
     assert result.focus.categories == []
     assert result.focus.category is None
-    assert result.clarification.required is True
-    assert "focus.categories" in result.clarification.missing_fields
+    assert result.clarification.required is False
+    assert result.clarification.missing_fields == []

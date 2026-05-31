@@ -50,7 +50,7 @@
         "deadline_months": null
       },
       "clarification": {
-        "required": true
+        "required": false
       }
     }
   },
@@ -97,8 +97,8 @@
     }
   },
   {
-    "id": "clarification_answer_full",
-    "description": "Full clarification answer for goal amount and deadline",
+    "id": "active_workflow_goal_merge",
+    "description": "Active workflow merges goal fields from follow-up message",
     "message": "120 тысяч за 6 месяцев",
     "chat_context": {
       "active_workflow": {
@@ -130,44 +130,6 @@
       },
       "clarification": {
         "required": false
-      }
-    }
-  },
-  {
-    "id": "clarification_answer_partial",
-    "description": "Partial clarification answer with only amount",
-    "message": "120 тысяч",
-    "chat_context": {
-      "active_workflow": {
-        "workflow_run_id": "run_123",
-        "status": "awaiting_user_input",
-        "missing_fields": ["goal.amount", "goal.deadline_months"],
-        "intent_result": {
-          "primary_intent": "goal_analysis",
-          "intents": ["goal_analysis"],
-          "requested_functions": ["goal_analysis"],
-          "goal": {
-            "name": "ноутбук",
-            "amount": null,
-            "deadline_months": null
-          },
-          "clarification": {
-            "required": true,
-            "reason": "missing_required_data",
-            "missing_fields": ["goal.amount", "goal.deadline_months"],
-            "question": "На какую сумму и за какой срок ты хочешь накопить?"
-          }
-        }
-      }
-    },
-    "expected": {
-      "goal": {
-        "amount": 120000,
-        "deadline_months": null
-      },
-      "clarification": {
-        "required": true,
-        "missing_fields": ["goal.deadline_months"]
       }
     }
   },

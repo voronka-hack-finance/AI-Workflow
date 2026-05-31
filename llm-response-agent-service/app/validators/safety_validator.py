@@ -1,6 +1,4 @@
-"""SafetyValidator."""
+"""Backward-compatible alias for input validation."""
+from app.validators.input_validator import InputValidator as SafetyValidator
 
-
-class SafetyValidator:
-    # TODO: implement
-    pass
+__all__ = ["SafetyValidator"]

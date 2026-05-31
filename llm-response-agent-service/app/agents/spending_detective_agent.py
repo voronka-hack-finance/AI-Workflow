@@ -1,11 +1,8 @@
 """SpendingDetectiveAgent."""
 from app.agents.base_agent import BaseAgent
-from app.schemas.agent_output import AgentOutput
+from app.prompts.spending_detective_prompt import build_spending_detective_messages
 
 
 class SpendingDetectiveAgent(BaseAgent):
-    name = "spendingdetective"
-
-    async def run(self, context: dict) -> AgentOutput:
-        # TODO: implement LLM call
-        return AgentOutput(agent_name=self.name)
+    name = "spending_detective"
+    build_messages = staticmethod(build_spending_detective_messages)

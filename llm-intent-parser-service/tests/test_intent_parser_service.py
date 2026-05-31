@@ -65,11 +65,30 @@ async def test_goal_with_full_data(service: IntentParserService) -> None:
 
 
 @pytest.mark.asyncio
+async def test_saving_question_does_not_require_clarification(service: IntentParserService) -> None:
+    response = await service.parse(_request("как сэкономить мне?"))
+    assert "action_plan" in response.intent_result.requested_functions
+    assert response.intent_result.clarification.required is False
+
+
+@pytest.mark.asyncio
 async def test_goal_with_missing_data(service: IntentParserService) -> None:
     response = await service.parse(_request("Смогу ли накопить на ноутбук?"))
-    assert response.intent_result.clarification.required is True
-    assert "goal.amount" in response.intent_result.clarification.missing_fields
-    assert "goal.deadline_months" in response.intent_result.clarification.missing_fields
+    assert "goal_analysis" in response.intent_result.requested_functions
+    assert response.intent_result.clarification.required is False
+
+
+@pytest.mark.asyncio
+async def test_active_workflow_goal_merge(service: IntentParserService) -> None:
+    response = await service.parse(
+        _request(
+            "120 тысяч за 6 месяцев",
+            chat_context={"active_workflow": _goal_clarification_workflow()},
+        )
+    )
+    assert response.intent_result.goal.amount == 120000
+    assert response.intent_result.goal.deadline_months == 6
+    assert response.intent_result.clarification.required is False
 
 
 @pytest.mark.asyncio
@@ -101,30 +120,3 @@ async def test_comparison_scenario(service: IntentParserService) -> None:
     response = await service.parse(_request("Я стал тратить больше?"))
     assert response.intent_result.requested_functions == ["expense_breakdown"]
     assert response.intent_result.comparison.enabled is True
-
-
-@pytest.mark.asyncio
-async def test_clarification_answer_full(service: IntentParserService) -> None:
-    response = await service.parse(
-        _request(
-            "120 тысяч за 6 месяцев",
-            chat_context={"active_workflow": _goal_clarification_workflow()},
-        )
-    )
-    assert response.intent_result.goal.amount == 120000
-    assert response.intent_result.goal.deadline_months == 6
-    assert response.intent_result.clarification.required is False
-
-
-@pytest.mark.asyncio
-async def test_clarification_answer_partial(service: IntentParserService) -> None:
-    response = await service.parse(
-        _request(
-            "120 тысяч",
-            chat_context={"active_workflow": _goal_clarification_workflow()},
-        )
-    )
-    assert response.intent_result.goal.amount == 120000
-    assert response.intent_result.goal.deadline_months is None
-    assert response.intent_result.clarification.required is True
-    assert response.intent_result.clarification.missing_fields == ["goal.deadline_months"]

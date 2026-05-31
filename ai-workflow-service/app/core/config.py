@@ -26,6 +26,10 @@ class Settings(BaseSettings):
         default="ai.workflow.tasks",
         validation_alias="RABBITMQ_WORKFLOW_QUEUE",
     )
+    rabbitmq_workflow_result_queue: str = Field(
+        default="ai.workflow.results",
+        validation_alias="RABBITMQ_WORKFLOW_RESULT_QUEUE",
+    )
     rabbitmq_prefetch_count: int = Field(default=3, validation_alias="RABBITMQ_PREFETCH_COUNT")
 
     ai_workflow_max_concurrent_runs: int = Field(
@@ -43,6 +47,10 @@ class Settings(BaseSettings):
     intent_parser_http_timeout_seconds: float = Field(
         default=150.0,
         validation_alias="INTENT_PARSER_HTTP_TIMEOUT_SECONDS",
+    )
+    response_agent_http_timeout_seconds: float = Field(
+        default=300.0,
+        validation_alias="RESPONSE_AGENT_HTTP_TIMEOUT_SECONDS",
     )
 
     intent_parser_service_url: str = Field(

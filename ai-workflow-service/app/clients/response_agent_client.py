@@ -16,7 +16,7 @@ class ResponseAgentClient(BaseServiceClient):
         super().__init__(
             base_url=config.response_agent_service_url,
             service_name="llm-response-agent-service",
-            timeout=config.ai_workflow_http_timeout_seconds,
+            timeout=config.response_agent_http_timeout_seconds,
             max_retries=config.ai_workflow_http_max_retries,
         )
 

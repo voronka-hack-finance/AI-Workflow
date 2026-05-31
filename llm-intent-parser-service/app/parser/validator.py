@@ -71,99 +71,7 @@ def _normalize_constraints(payload: dict[str, Any]) -> None:
         payload["constraints"] = {**_DEFAULT_CONSTRAINTS, **constraints}
 
 
-def _question_for_missing_fields(missing_fields: list[str]) -> str:
-    if missing_fields == ["goal.deadline_months"]:
-        return "За какой срок ты хочешь накопить?"
-    if missing_fields == ["goal.amount"]:
-        return "На какую сумму ты хочешь накопить?"
-    if set(missing_fields) == {"goal.amount", "goal.deadline_months"}:
-        return "На какую сумму и за какой срок ты хочешь накопить?"
-    return "Уточни, пожалуйста, недостающие данные."
-
-
 def _normalize_clarification(payload: dict[str, Any]) -> None:
-    clarification = payload.get("clarification")
-    if clarification is None:
-        payload["clarification"] = _DEFAULT_CLARIFICATION.copy()
-        return
-    if isinstance(clarification, str):
-        payload["clarification"] = {
-            "required": True,
-            "reason": "missing_required_data",
-            "missing_fields": [],
-            "question": clarification,
-        }
-        return
-    if isinstance(clarification, list):
-        if not clarification:
-            payload["clarification"] = _DEFAULT_CLARIFICATION.copy()
-            return
-        dict_items = [item for item in clarification if isinstance(item, dict)]
-        if dict_items:
-            merged = {**_DEFAULT_CLARIFICATION, **dict_items[0]}
-            required = merged.get("required")
-            if isinstance(required, list):
-                merged["required"] = bool(required)
-            payload["clarification"] = merged
-            return
-        strings = [item for item in clarification if isinstance(item, str) and item.strip()]
-        missing_fields = [item for item in strings if "." in item]
-        if missing_fields:
-            payload["clarification"] = {
-                "required": True,
-                "reason": "missing_required_data",
-                "missing_fields": missing_fields,
-                "question": _question_for_missing_fields(missing_fields),
-            }
-            return
-        question = strings[0] if strings else None
-        payload["clarification"] = {
-            "required": bool(question),
-            "reason": "missing_required_data" if question else None,
-            "missing_fields": [],
-            "question": question,
-        }
-        return
-    if isinstance(clarification, dict):
-        payload["clarification"] = {**_DEFAULT_CLARIFICATION, **clarification}
-
-
-def _drop_resolved_clarification(payload: dict[str, Any]) -> None:
-    clarification = payload.get("clarification")
-    if not isinstance(clarification, dict) or not clarification.get("required"):
-        return
-
-    missing_fields = clarification.get("missing_fields") or []
-    if not missing_fields:
-        return
-
-    goal = payload.get("goal") if isinstance(payload.get("goal"), dict) else {}
-    focus = payload.get("focus") if isinstance(payload.get("focus"), dict) else {}
-    budget_plan = payload.get("budget_plan") if isinstance(payload.get("budget_plan"), dict) else {}
-
-    remaining_missing: list[str] = []
-    for field_path in missing_fields:
-        if not isinstance(field_path, str):
-            continue
-        if field_path == "goal.amount" and goal.get("amount") is not None:
-            continue
-        if field_path == "goal.deadline_months" and goal.get("deadline_months") is not None:
-            continue
-        if field_path in {"focus.category", "focus.categories"} and (
-            focus.get("category") or focus.get("categories")
-        ):
-            continue
-        if field_path == "budget_plan.horizon" and budget_plan.get("horizon"):
-            continue
-        remaining_missing.append(field_path)
-
-    if remaining_missing:
-        clarification["missing_fields"] = remaining_missing
-        clarification["required"] = True
-        if not clarification.get("question"):
-            clarification["question"] = _question_for_missing_fields(remaining_missing)
-        return
-
     payload["clarification"] = _DEFAULT_CLARIFICATION.copy()
 
 
@@ -199,7 +107,6 @@ def _normalize_llm_payload(payload: dict[str, Any], requested_functions: list[st
     _normalize_style(normalized)
     _normalize_constraints(normalized)
     _normalize_clarification(normalized)
-    _drop_resolved_clarification(normalized)
     _normalize_intents(normalized, requested_functions)
     normalize_focus_category(normalized)
     return normalized

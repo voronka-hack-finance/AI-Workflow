@@ -67,12 +67,6 @@ def build_message_intent_hints(message: str) -> dict[str, Any] | None:
             ["goal_analysis"],
             recommendation_horizon="goal_deadline",
             goal={"name": "цель", "amount": None, "deadline_months": None},
-            clarification={
-                "required": True,
-                "reason": "missing_required_data",
-                "missing_fields": ["goal.amount", "goal.deadline_months"],
-                "question": "На какую сумму и за какой срок ты хочешь накопить?",
-            },
         )
 
     if "накопить" in lowered and "ноутбук" in lowered:
@@ -92,12 +86,6 @@ def build_message_intent_hints(message: str) -> dict[str, Any] | None:
             "goal_analysis",
             ["goal_analysis"],
             goal={"name": "ноутбук", "amount": None, "deadline_months": None},
-            clarification={
-                "required": True,
-                "reason": "missing_required_data",
-                "missing_fields": ["goal.amount", "goal.deadline_months"],
-                "question": "На какую сумму и за какой срок ты хочешь накопить на ноутбук?",
-            },
         )
 
     if "отели" in lowered or "кино" in lowered:
@@ -172,6 +160,32 @@ def build_message_intent_hints(message: str) -> dict[str, Any] | None:
 
     if "куда уходят деньги" in lowered or "куда уходят" in lowered:
         return _hint("expense_breakdown", ["expense_breakdown"])
+
+    if any(
+        token in lowered
+        for token in (
+            "сэконом",
+            "эконом",
+            "меньше трат",
+            "улучшить финанс",
+            "начать эконом",
+            "что мне делать",
+        )
+    ):
+        if not any(token in lowered for token in ("накопить", "смогу ли", "купить", "цель")):
+            return _hint(
+                "action_plan",
+                ["action_plan", "budget_recommendation"],
+                recommendation_horizon="next_7_days",
+                focus={
+                    "category": None,
+                    "categories": [],
+                    "merchant": None,
+                    "mcc": None,
+                    "card_id": None,
+                    "direction": "expense",
+                },
+            )
 
     if lowered.startswith("а за неделю") or lowered == "а за неделю?":
         return _hint(
@@ -252,13 +266,5 @@ def apply_message_hints(request: IntentParseRequest, intent: IntentResult) -> In
             focus_update = intent.focus.model_dump()
             focus_update.update(focus)
             intent = intent.model_copy(update={"focus": focus_update})
-
-    hint_clarification = hints.get("clarification")
-    if isinstance(hint_clarification, dict) and hint_clarification.get("required"):
-        missing_fields = hint_clarification.get("missing_fields") or []
-        goal = intent.goal
-        goal_incomplete = goal.amount is None or goal.deadline_months is None
-        if goal_incomplete and any(field.startswith("goal.") for field in missing_fields):
-            intent = intent.model_copy(update={"clarification": hint_clarification})
 
     return intent

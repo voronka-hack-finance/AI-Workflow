@@ -7,7 +7,6 @@ from typing import Any
 
 from app.core.errors import safe_user_message
 from app.workflow.deps import WorkflowDeps
-from app.workflow.routing import resolve_clarification_question
 from app.workflow.state import WorkflowGraphState
 from app.workflow.statuses import WorkflowStatus
 
@@ -91,30 +90,6 @@ def make_generate_response(deps: WorkflowDeps) -> NodeFn:
         return {"response_result": response_result, "error": None}
 
     return generate_response
-
-
-def make_send_clarification(deps: WorkflowDeps) -> NodeFn:
-    async def send_clarification(state: WorkflowGraphState) -> dict[str, Any]:
-        task = state["task"]
-        question = resolve_clarification_question(state)
-        await deps.backend_chat.send_clarification(
-            request_id=task.request_id,
-            workflow_run_id=task.workflow_run_id,
-            user_id=task.user_id,
-            chat_id=task.chat_id,
-            message_id=task.message_id,
-            question=question,
-        )
-        await deps.backend_chat.update_workflow_status(
-            request_id=task.request_id,
-            workflow_run_id=task.workflow_run_id,
-            user_id=task.user_id,
-            chat_id=task.chat_id,
-            status=WorkflowStatus.AWAITING_USER_INPUT,
-        )
-        return {"workflow_status": WorkflowStatus.AWAITING_USER_INPUT}
-
-    return send_clarification
 
 
 def make_send_final_answer(deps: WorkflowDeps) -> NodeFn:

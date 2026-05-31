@@ -1,3 +1,19 @@
+x-env-files: &env-files
+  env_file:
+    - path: .env.example
+      required: true
+    - path: .env
+      required: false
+
+x-host-gateway: &host-gateway
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+
+# Context builder uses backend-hackathon RabbitMQ (:5673) for backend data jobs,
+# not the workflow RabbitMQ below (:5672). Backend consumes ai.backend.data.requests.
+x-backend-rabbitmq-url: &backend-rabbitmq-url
+  RABBITMQ_URL: ${BACKEND_RABBITMQ_URL:-amqp://guest:guest@host.docker.internal:5673/}
+
 services:
   rabbitmq:
     image: rabbitmq:3-management
@@ -11,32 +27,13 @@ services:
       - ./infra/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
       - ./infra/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
 
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "8080:80"
-    volumes:
-      - ./infra/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - ai-workflow-service
-      - llm-intent-parser-service
-      - ai-context-builder-service
-      - analytics-service
-      - llm-response-agent-service
-
   ai-workflow-service:
+    <<: *env-files
     build:
       context: .
       dockerfile: ai-workflow-service/Dockerfile
     ports:
       - "8010:8010"
-    env_file:
-      - path: .env.example
-        required: true
-      - path: .env
-        required: false
-    environment:
-      INTENT_PARSER_HTTP_TIMEOUT_SECONDS: 150
     depends_on:
       - rabbitmq
       - llm-intent-parser-service
@@ -45,49 +42,49 @@ services:
       - llm-response-agent-service
 
   llm-intent-parser-service:
+    <<: [*env-files, *host-gateway]
     build:
       context: .
       dockerfile: llm-intent-parser-service/Dockerfile
     ports:
       - "8011:8011"
-    env_file:
-      - path: .env.example
-        required: true
-      - path: .env
-        required: false
     environment:
-      # Hardcoded for Docker dev — do not inherit mock from shell or env_file
       INTENT_PARSER_LLM_PROVIDER: openai_compatible
       INTENT_PARSER_LLM_MODEL: ${INTENT_PARSER_LLM_MODEL:-qwen2.5-7b-instruct}
       OPENAI_COMPATIBLE_BASE_URL: http://host.docker.internal:1234/v1
       INTENT_PARSER_LLM_TIMEOUT_SECONDS: 120
       INTENT_PARSER_FEW_SHOT_LIMIT: 0
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
 
   ai-context-builder-service:
+    <<: [*env-files, *host-gateway]
     build:
       context: .
       dockerfile: ai-context-builder-service/Dockerfile
     ports:
       - "8012:8012"
-    env_file:
-      - .env.example
+    environment:
+      CONTEXT_BUILDER_DATA_PROVIDER: rabbitmq
+      <<: *backend-rabbitmq-url
 
   analytics-service:
+    <<: *env-files
     build:
       context: .
       dockerfile: analytics-service/Dockerfile
     ports:
       - "8013:8013"
-    env_file:
-      - .env.example
 
   llm-response-agent-service:
+    <<: [*env-files, *host-gateway]
     build:
       context: .
       dockerfile: llm-response-agent-service/Dockerfile
     ports:
       - "8014:8014"
-    env_file:
-      - .env.example
+    environment:
+      RESPONSE_AGENT_LLM_PROVIDER: openai_compatible
+      RESPONSE_AGENT_LLM_MODEL: ${RESPONSE_AGENT_LLM_MODEL:-qwen2.5-7b-instruct}
+      OPENAI_COMPATIBLE_BASE_URL: http://host.docker.internal:1234/v1
+      RESPONSE_AGENT_LLM_TIMEOUT_SECONDS: 120
+      RESPONSE_AGENT_MAX_OUTPUT_TOKENS: 3000
+      RESPONSE_AGENT_MAX_SELECTED_AGENTS: 3

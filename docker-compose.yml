@@ -1,2 +1,0 @@
-# Production-oriented compose (use docker-compose.dev.yml for local development)
-services: {}

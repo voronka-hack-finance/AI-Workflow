@@ -10,7 +10,6 @@ from app.workflow.nodes import (
     make_generate_response,
     make_parse_intent,
     make_run_analytics,
-    make_send_clarification,
     make_send_final_answer,
 )
 from app.workflow.routing import (
@@ -29,7 +28,6 @@ def build_workflow_graph(deps: WorkflowDeps):
     graph.add_node("build_context", make_build_context(deps))
     graph.add_node("run_analytics", make_run_analytics(deps))
     graph.add_node("generate_response", make_generate_response(deps))
-    graph.add_node("send_clarification", make_send_clarification(deps))
     graph.add_node("send_final_answer", make_send_final_answer(deps))
     graph.add_node("fail_workflow", make_fail_workflow(deps))
 
@@ -40,7 +38,6 @@ def build_workflow_graph(deps: WorkflowDeps):
     graph.add_conditional_edges("run_analytics", route_after_run_analytics)
     graph.add_conditional_edges("generate_response", route_after_generate_response)
 
-    graph.add_edge("send_clarification", END)
     graph.add_edge("send_final_answer", END)
     graph.add_edge("fail_workflow", END)
 
